@@ -26,6 +26,28 @@ print(value(prob.objective))
 for v in prob.variables():
     print(v.name,"=",v.varValue)
 
+**** Assignment****
+
+from pulp import *
+jobs=["1","2","3","4","5"]
+supply={"1":1,"2":1,"3":1,"4":1,"5":1}
+machines=["I","II","III","IV","V"]
+demand={"I":1,"II":1,"III":1,"IV":1,"V":1}
+costs={"1":{"I":3,"II":8,"III":2,"IV":10,"V":3},"2":{"I":8,"II":7,"III":2,"IV":9,"V":7},"3":{"I":6,"II":4,"III":2,"IV"
+:7,"V":5},"4":{"I":8,"II":4,"III":2,"IV":3,"V":5},"5":{"I":9,"II":10,"III":6,"IV":9,"V":10}}
+prob=LpProblem("Jobs Machines Problem",LpMinimize)
+Routs=[(w,b) for w in jobs for b in machines]
+vars=LpVariable.dicts('Route',(jobs,machines),0,None,LpInteger)
+prob+=lpSum([vars[w][b]*costs[w][b] for (w,b) in Routs]),"Sum_of_Costs"
+for w in jobs:
+ prob+=lpSum([vars[w][b] for b in machines])<=supply[w],"Sum_of_Prod_%s"%w
+for b in machines:
+ prob+=lpSum([vars[w][b] for w in jobs])>=demand[b],"Sum_Prod_%s"%b
+prob.writeLP
+#Squeezed text(63 lines).
+prob.solve()
+1
+value(prob.objective)
 
 
 
